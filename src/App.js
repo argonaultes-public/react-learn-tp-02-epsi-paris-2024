@@ -13,6 +13,27 @@ export default function Board() {
   const [xIsNext, setXIsNext] = useState(true);
 
 
+  function calculateWinner(squares) {
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i]; // Object destructuring 
+      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+        return squares[a];
+      }
+    }
+    return null;
+  }  
+
+
   // modifier la valeur de squares
   // en paramètre un 
   
@@ -20,7 +41,7 @@ export default function Board() {
     console.log('click on square');
     // Boolean coercion
     // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean#boolean_coercion
-    if (squares[i]) {
+    if (squares[i] || calculateWinner(squares)) {
         return;
     }
 
@@ -34,8 +55,17 @@ export default function Board() {
     setSquares(newSquare);
   }
 
+  let gameStatus;
+  const winner = calculateWinner(squares);
+  if (winner) {
+    gameStatus = `Winner: ${winner}`;
+  } else {
+    gameStatus = `Next player: ${xIsNext ? 'X' : 'O'}`;
+  }
+
   return (
     <>
+      <div className="status">{gameStatus}</div>
       <div className="board-row">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)}/>
         <Square value={squares[1]} onSquareClick={() => handleClick(1)}/>
