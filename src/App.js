@@ -8,7 +8,7 @@ function Square({value, onSquareClick}) {
   );
 }
 
-function Board({xIsNext, squares, setXIsNext, onPlay}) {
+function Board({xIsNext, squares, onPlay}) {
 
 
   function calculateWinner(squares) {
@@ -34,7 +34,8 @@ function Board({xIsNext, squares, setXIsNext, onPlay}) {
 
   // modifier la valeur de squares
   // en paramètre un 
-  
+
+
   function handleClick(i) {
     console.log('click on square');
     // Boolean coercion
@@ -49,7 +50,6 @@ function Board({xIsNext, squares, setXIsNext, onPlay}) {
     } else {
       newSquare[i] = 'O';
     }
-    setXIsNext(!xIsNext);
     onPlay(newSquare);
     //setSquares(newSquare);
   }
@@ -85,22 +85,43 @@ function Board({xIsNext, squares, setXIsNext, onPlay}) {
 }
 
 export default function Game() {
-  const [xIsNext, setXIsNext] = useState(true);
   const [history, setHistory] = useState([Array(9).fill(null)]);
-  const currentBoard = history[history.length - 1];
+  const [currentMove, setCurrentMove] = useState(0);
+  const currentBoard = history[currentMove];
+  const xIsNext = currentMove % 2 === 0;
 
   function onPlay(newSquares) {
-    setHistory([...history, newSquares]);
+    setHistory([...history.slice(0, currentMove + 1), newSquares]);
+    setCurrentMove(currentMove + 1);
+    console.log(`Method 1 currentMove: ${currentMove + 1}`);
+    console.log(`Method 2 history.lenght: ${history.length - 1}`);
     console.log('play');
   }
+
+  function jumpTo(nextMove) {
+    setCurrentMove(nextMove);
+    console.log(nextMove);
+  }
+
+  const moves = history.map( (squares, move) => {
+    let description = move == 0 ? "Go to game start" : `Go to game # ${move}`;
+
+    let descriptionBis = move > 0 ? `Go to game # ${move}` : "Go to game start";
+
+    return (
+      <li key={move}>
+          <button onClick={() => jumpTo(move)}>{description}</button>
+      </li>
+    )
+  });
 
   return (
     <div className="game">
       <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentBoard} setXIsNext={setXIsNext} onPlay={onPlay} />
+        <Board xIsNext={xIsNext} squares={currentBoard} onPlay={onPlay} />
       </div>
       <div className="game-info">
-        <ol>{/*TODO*/}</ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   );
